@@ -20,11 +20,11 @@ export const signup = async (req, res) => {
       { expiresIn: '1h' }
     )
 
-    return res.status(201).json({user, token, message: 'successful signUp'})
+    return res.status(201).json({user, token, message: 'successfull signUp'})
     
   } catch (error) {
     console.log(error)
-    return res.status(400).json({ message: 'something went wrong during signup' })
+    return res.status(400).json({ message: 'something went wrong during sign up' })
   }
 }
 
@@ -49,10 +49,28 @@ export const signin = async (req, res) => {
       { expiresIn: '1h' }
     )
 
-    return res.status(201).json({isUserExist, token, message: 'successful signIn'})
+    return res.status(201).json({user: isUserExist, token, message: 'successfull signIn'})
     
   } catch (error) {
     console.log(error)
-    return res.status(400).json({ message: 'something went wrong during signin' })
+    return res.status(400).json({ message: 'something went wrong during sign in' })
+  }
+}
+
+export const googleSignIn = async (req, res) => {
+  try {
+    const { email, name, token, googleId } = req.body
+    
+    const existUser = await User.findOne({ email })
+    if (existUser) {
+      const user = { _id: existUser._id.toString(), email, name }
+      return res.status(200).json({result, token})
+    }
+    
+    const user = await User.create({ email, name, googleId })
+    
+    return res.status(201).json({user, token})
+  } catch (error) {
+    return res.status(400).json({ message: 'something went wrong during google sign in' })
   }
 }
