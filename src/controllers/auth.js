@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import User from '../models/user.js'
+import zxcvbn from 'zxcvbn'
 
 export const signup = async (req, res) => {
   try {
@@ -9,6 +10,11 @@ export const signup = async (req, res) => {
     const isUserExist = await User.findOne({ email })
     if (isUserExist) {
       return res.status(400).json({message: 'user already exist'})
+    }
+
+    const passwordStrength = zxcvbn(password).score;
+    if (passwordStrength < 3) {
+      return res.status(400).json({message: 'Password is too weak, please choose a stronger password'})
     }
 
     const hashPassword = await bcrypt.hash(password, 10)

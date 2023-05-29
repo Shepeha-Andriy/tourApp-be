@@ -5,6 +5,7 @@ import cors from 'cors'
 import morgan from 'morgan'
 
 import authRouter from './routes/auth.js'
+import tourRouter from './routes/tour.js'
 
 const app = express()
 dotenv.config()
@@ -21,6 +22,7 @@ app.use(cors())
 
 //Routes
 app.use('/api/auth', authRouter)
+app.use('/api/tour', tourRouter)
 
 app.get('/', (req, res) => {
   res.send('hi')
