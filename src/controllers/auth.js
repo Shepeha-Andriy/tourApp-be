@@ -60,11 +60,11 @@ export const signin = async (req, res) => {
 export const googleSignIn = async (req, res) => {
   try {
     const { email, name, token, googleId } = req.body
-    
+
     const existUser = await User.findOne({ email })
     if (existUser) {
       const user = { _id: existUser._id.toString(), email, name }
-      return res.status(200).json({result, token})
+      return res.status(200).json({user: user, token})
     }
     
     const user = await User.create({ email, name, googleId })
