@@ -22,9 +22,22 @@ export const createTour = async (req, res) => {
 
 export const getTours = async (req, res) => {
   try {
-    const tours = await Tour.find()
+    const {page} = req.query
+    // const tours = await Tour.find()
 
-    return res.status(200).json(tours)
+    // return res.status(200).json(tours)
+
+    const limit = 6
+    const startIndex = (Number(page) - 1) * limit;
+    const total = await Tour.countDocuments({})
+    const tours = await Tour.find().limit(limit).skip(startIndex)
+
+    return res.json({
+      data: tours,
+      currentPage: Number(page),
+      totalTours: total,
+      numberOfPages: Math.ceil(total / limit)
+    })
   } catch (error) {
     console.log(error)
     return res.status(400).json({ message: 'something went wrong during get all tours' })
@@ -98,5 +111,44 @@ export const updateTour = async (req, res) => {
   } catch (error) {
     console.log(error)
     return res.status(400).json({ message: 'something went wrong during updating tour' })
+  }
+}
+
+export const getToursBySearch = async (req, res) => {
+  try {
+    const { searchQuery } = req.query
+    const title = new RegExp(searchQuery, 'i')
+    const tours = await Tour.find({title})
+
+    return res.json(tours)
+    
+  } catch (error) {
+    return res.status(400).json({ message: 'something went wrong during getting tour by search' })
+  }
+}
+
+export const likeTour = async (req, res) => {
+  try {
+    const { id } = req.params
+    
+    if (!mongoose.Types.ObjectId.isValid(req.userId)) {
+      return res.status(400).json({ message: `No tour exist width id: ${id}` })
+    }
+
+    const tour = await Tour.findById(id)
+    const index = tour.likes.findIndex((id) => id === String(req.userId))
+
+    if (index === -1) {
+      tour.likes.push(req.userId)
+    } else {
+      tour.likes = tour.likes.filter(id => id !== String(req.userId))
+    }
+
+    const updatedTour = await Tour.findByIdAndUpdate(id, tour, { new: true })
+    
+    return res.status(200).json(updatedTour)
+    
+  } catch (error) {
+    return res.status(400).json({ message: 'something went wrong during like post' })
   }
 }

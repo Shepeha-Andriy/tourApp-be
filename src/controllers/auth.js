@@ -69,8 +69,8 @@ export const googleSignIn = async (req, res) => {
 
     const existUser = await User.findOne({ email })
     if (existUser) {
-      const user = { _id: existUser._id.toString(), email, name }
-      return res.status(200).json({user: user, token})
+      // const user = { _id: existUser._id.toString(), email, name }
+      return res.status(200).json({user: existUser, token})
     }
     
     const user = await User.create({ email, name, googleId })

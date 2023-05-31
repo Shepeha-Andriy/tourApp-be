@@ -8,7 +8,7 @@ const schema = new mongoose.Schema({
   // tags: { type: [String] },
   imageFile: { type: String },
   createdAt: { type: Date, default: new Date() },
-  likes: { type: Number, default: 0 },
+  likes: { type: [String], default: [] },
 })
 
 export default mongoose.model('Tour', schema)
